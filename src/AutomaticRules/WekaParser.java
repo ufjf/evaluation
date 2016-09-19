@@ -99,15 +99,13 @@ public class WekaParser {
             System.out.println("Inicio ARFF: " + new Date());
             
             //Gerando ARFF baseado nas tags que o usuario quiser
+            Set<String> haveYes = new HashSet<String>();
+            Set<String> haveUpDown = new HashSet<String>();
+            
             StringBuilder arff = new StringBuilder();
+            StringBuilder arffData = new StringBuilder();
             
-            arff.append("@relation ").append(root).append('\n');
-
-            for (String mapeamentoTag : mapeamentoTags) {
-                arff.append("@attribute '").append(mapeamentoTag).append("' {y,u,d}\n");
-            }
-            
-            arff.append("@data\n");
+            arffData.append("@data\n");
 
             for (List<String> mapeamentoDiff1 : mapeamentoDiff) {
                 if (mapeamentoDiff1.contains(keyChoice)) {
@@ -116,29 +114,49 @@ public class WekaParser {
                 //System.out.println(mapeamentoDiff1);
                 for (int j = 0; j < mapeamentoTags.size(); j++) {
                     if (j != 0) {
-                        arff.append(',');
+                        arffData.append(',');
                     }
                     if(mapeamentoDiff1.contains(mapeamentoTags.get(j)+"+up")){
-                        arff.append('u');
+                        arffData.append('u');
+                        haveUpDown.add(mapeamentoTags.get(j));
                     }
                     else{
                         if(mapeamentoDiff1.contains(mapeamentoTags.get(j)+"+down")){
-                            arff.append('d');
+                            arffData.append('d');
+                            haveUpDown.add(mapeamentoTags.get(j));
                         }
                         else{
                             if(mapeamentoDiff1.contains(mapeamentoTags.get(j))){
-                                arff.append('y');
+                                arffData.append('y');
+                                haveYes.add(mapeamentoTags.get(j));
                             }
                             else{
-                                arff.append('?');
+                                arffData.append('?');
                             }
                         }
                          
                     }
                 }
-                arff.append('\n');
+                arffData.append('\n');
             }
+            
+            arff.append("@relation ").append(root).append('\n');
 
+            for (String mapeamentoTag : mapeamentoTags) {
+                arff.append("@attribute '").append(mapeamentoTag).append("' {");
+                if(haveUpDown.contains(mapeamentoTag)) {
+                    arff.append("u,d");
+                    if(haveYes.contains(mapeamentoTag))
+                        arff.append(",y"); // Isso não deveria acontecer(!)
+                } else {
+                    arff.append("y");
+                }
+                
+                arff.append("}\n");
+            }
+            
+            arff.append(arffData);
+            
             System.out.println(arff);
 
             System.out.println("Inicio Apriori: " + new Date());
