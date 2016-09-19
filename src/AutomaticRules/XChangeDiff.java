@@ -43,9 +43,6 @@ public class XChangeDiff {
                         }
                         catch (Exception a){
                             if (!(aux.trim()).equalsIgnoreCase(aux1.trim())) {
-                                if(atribute.equalsIgnoreCase("grosspay")) {
-                                    System.out.println("DIFFFF: "+aux+ " --- "+aux1);
-                                }
                                 regDiff.add(atribute);
                            }
                         }
